@@ -1,0 +1,30 @@
+version: 2
+
+updates:
+  # Python package (hatchling / pyproject.toml at the repo root).
+  - package-ecosystem: "pip"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    open-pull-requests-limit: 5
+
+  # OpenCLAW integration (package.json + package-lock.json).
+  - package-ecosystem: "npm"
+    directory: "/integrations/openclaw-atlas"
+    schedule:
+      interval: "weekly"
+    open-pull-requests-limit: 5
+
+  # Obsidian plugin (package.json; no lockfile committed).
+  - package-ecosystem: "npm"
+    directory: "/obsidian-plugin"
+    schedule:
+      interval: "weekly"
+    open-pull-requests-limit: 5
+
+  # GitHub Actions used by .github/workflows/*.yml.
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    open-pull-requests-limit: 5
