@@ -1,0 +1,8 @@
+{
+  "schema": "next-session/v2",
+  "session_date": "2026-08-07",
+  "project": "atlas",
+  "state": "PARKED pending ruling R1 (iris-memory-ecosystem ultra audit 2026-08-06): daemons never installed, ~/.atlas frozen since 2026-07-16, atlas_mcp.py unregistered. No build work here until Anthony rules park-vs-revive.",
+  "launch_one_liner": "Parked -- consult the R1 park-vs-revive ruling before touching this repo.",
+  "next_action_for_agent": "Read anthony-wiki-vault/build-plans/iris-memory-ecosystem-ultra-audit-2026-08-06.md ruling R1. Do not install daemons, register MCP, or build until Anthony rules."
+}
