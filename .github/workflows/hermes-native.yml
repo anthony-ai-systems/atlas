@@ -12,6 +12,11 @@ on:
       - "integrations/hermes-atlas/**"
       - "tests/hermes/**"
       - ".github/workflows/hermes-native.yml"
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
 permissions:
   contents: read
@@ -19,6 +24,7 @@ permissions:
 jobs:
   pinned-hermes-contract:
     runs-on: blacksmith-4vcpu-ubuntu-2404
+    timeout-minutes: 30
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
 

@@ -9,11 +9,20 @@ on:
     branches: [main, master]
   pull_request:
     branches: [main, master]
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
 
 jobs:
   windows-sqlite-and-unit:
     name: windows py3.14 unit + sqlite lifecycle
     runs-on: windows-latest
+    timeout-minutes: 30
     steps:
       - uses: actions/checkout@v7
       - uses: actions/setup-python@v7
@@ -29,6 +38,7 @@ jobs:
   test:
     name: py${{ matrix.python-version }} + neo4j
     runs-on: blacksmith-4vcpu-ubuntu-2404
+    timeout-minutes: 30
 
     strategy:
       fail-fast: false
@@ -132,6 +142,7 @@ jobs:
     # loop does not close.
     name: demo.sh smoke (front-door end-to-end)
     runs-on: blacksmith-4vcpu-ubuntu-2404
+    timeout-minutes: 30
 
     services:
       neo4j:
