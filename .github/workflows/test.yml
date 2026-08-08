@@ -28,7 +28,7 @@ jobs:
 
   test:
     name: py${{ matrix.python-version }} + neo4j
-    runs-on: ubuntu-latest
+    runs-on: blacksmith-4vcpu-ubuntu-2404
 
     strategy:
       fail-fast: false
@@ -131,7 +131,7 @@ jobs:
     # never silently rot. The job fails if demo.sh exits non-zero OR if the
     # loop does not close.
     name: demo.sh smoke (front-door end-to-end)
-    runs-on: ubuntu-latest
+    runs-on: blacksmith-4vcpu-ubuntu-2404
 
     services:
       neo4j:
