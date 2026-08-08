@@ -45,7 +45,10 @@ jobs:
       - name: Install package-only development dependencies
         working-directory: integrations/openclaw-atlas
         run: |
-          npm ci --omit=optional
+          # Optional deps are required: TypeScript 7 ships its compiler binary
+          # as platform-specific @typescript/typescript-<os>-<arch> packages,
+          # all pinned with integrity hashes in package-lock.json.
+          npm ci
           ln -s ../../../.contract/openclaw node_modules/openclaw
 
       - name: Strict build and package tests
