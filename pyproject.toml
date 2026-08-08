@@ -90,7 +90,7 @@ full = [
 
 # pip install atlas-core[dev]
 dev = [
-    "pytest>=8.0",
+    "pytest>=9.1.1",
     "pytest-asyncio>=0.23",
     "pytest-cov>=4.1",
     "pytest-xdist>=3.5",
