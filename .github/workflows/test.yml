@@ -19,10 +19,44 @@ permissions:
   contents: read
 
 jobs:
+  changes:
+    name: Detect test-relevant changes
+    runs-on: blacksmith-4vcpu-ubuntu-2404
+    timeout-minutes: 5
+    outputs:
+      # Fallback 'true': on workflow_dispatch the filter step is skipped and
+      # the test jobs must always run.
+      tests: ${{ steps.filter.outputs.tests || 'true' }}
+    steps:
+      - uses: actions/checkout@v7
+      - uses: dorny/paths-filter@de90cc6fb38fc0963ad72b210f1f284cd68cea36 # v3.0.2
+        if: github.event_name == 'pull_request' || github.event_name == 'push'
+        id: filter
+        with:
+          # 'every' + negated globs: tests are relevant unless a changed file
+          # matches ALL the exclusions, i.e. docs/paper/site-only diffs skip
+          # the 7-job fan-out (windows + 5-version neo4j matrix + demo smoke).
+          # Everything else (atlas_core, tests, scripts, workflows, ...) still
+          # triggers it.
+          predicate-quantifier: every
+          filters: |
+            tests:
+              - '!docs/**'
+              - '!paper/**'
+              - '!site/**'
+              - '!**/*.md'
+              - '!LICENSE'
+
   windows-sqlite-and-unit:
     name: windows py3.14 unit + sqlite lifecycle
     runs-on: windows-latest
     timeout-minutes: 30
+    needs: changes
+    # Skipping still satisfies the required "windows py3.14 unit + sqlite
+    # lifecycle" context (a skipped job reports as passing to branch
+    # protection); a workflow-level paths: filter would instead leave all
+    # seven required contexts "Expected" forever.
+    if: needs.changes.outputs.tests == 'true'
     steps:
       - uses: actions/checkout@v7
       - uses: actions/setup-python@v7
@@ -39,6 +73,9 @@ jobs:
     name: py${{ matrix.python-version }} + neo4j
     runs-on: blacksmith-4vcpu-ubuntu-2404
     timeout-minutes: 30
+    needs: changes
+    # Skipped-yet-passing per the same rule as above — all 5 matrix contexts.
+    if: needs.changes.outputs.tests == 'true'
 
     strategy:
       fail-fast: false
@@ -47,7 +84,9 @@ jobs:
 
     services:
       neo4j:
-        image: neo4j:5.26
+        # Tag kept for readability; the digest is what gets pulled (manifest
+        # list for neo4j:5.26, resolved 2026-08-08).
+        image: neo4j:5.26@sha256:d9dd3dc7d1c78fa959191ff02dbdcbefadceaf83eee23428fb92a58cac8ad3fe
         env:
           NEO4J_AUTH: neo4j/atlasdev
           NEO4J_PLUGINS: '["apoc"]'
@@ -143,10 +182,15 @@ jobs:
     name: demo.sh smoke (front-door end-to-end)
     runs-on: blacksmith-4vcpu-ubuntu-2404
     timeout-minutes: 30
+    needs: changes
+    # Skipped-yet-passing per the same rule as the windows job.
+    if: needs.changes.outputs.tests == 'true'
 
     services:
       neo4j:
-        image: neo4j:5.26
+        # Tag kept for readability; the digest is what gets pulled (manifest
+        # list for neo4j:5.26, resolved 2026-08-08).
+        image: neo4j:5.26@sha256:d9dd3dc7d1c78fa959191ff02dbdcbefadceaf83eee23428fb92a58cac8ad3fe
         env:
           NEO4J_AUTH: neo4j/atlasdev
           NEO4J_PLUGINS: '["apoc"]'
