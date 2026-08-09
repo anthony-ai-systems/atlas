@@ -37,7 +37,7 @@ classifiers = [
 # pip install pulls 2GB of LLM/embedding clients. Default install is
 # the bare substrate; opt in to extras as you turn features on.
 dependencies = [
-    "graphiti-core>=0.28.2",
+    "graphiti-core>=0.29.3",
     "neo4j>=5.26.0",
     "pydantic>=2.0,<3",
     "python-ulid>=2.0",
