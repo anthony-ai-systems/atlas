@@ -1,0 +1,50 @@
+name: OpenClaw plugin release
+
+on:
+  push:
+    tags: ["openclaw-v*"]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+# No cancel-in-progress: never kill a release run mid-publish.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+
+jobs:
+  publish-tarball:
+    # GitHub-hosted (not Blacksmith): release runs are rare, so runner cost is
+    # irrelevant and stock-image parity (gh CLI) matters more than speed.
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+      # The committed tarball is byte-verified against an npm-pack rebuild by
+      # the pinned-openclaw-contract job on every push that touches the
+      # integration (plus the weekly canary). This job deliberately does NOT
+      # rebuild — rebuilding here would drag in the pinned OpenClaw host
+      # checkout; instead it publishes the artifact CI already proved.
+      - name: Verify checksum and tag/version agreement
+        working-directory: integrations/openclaw-atlas
+        run: |
+          shasum -a 256 -c CHECKSUMS.sha256
+          VERSION=$(node -p "require('./package.json').version")
+          if [ "$GITHUB_REF_NAME" != "openclaw-v${VERSION}" ]; then
+            echo "Ref '$GITHUB_REF_NAME' does not match package version 'openclaw-v${VERSION}'" >&2
+            exit 1
+          fi
+          test -f "atlas-memory-openclaw-${VERSION}.tgz"
+          echo "PLUGIN_VERSION=${VERSION}" >> "$GITHUB_ENV"
+      - name: Create GitHub Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release create "$GITHUB_REF_NAME" \
+            "integrations/openclaw-atlas/atlas-memory-openclaw-${PLUGIN_VERSION}.tgz" \
+            "integrations/openclaw-atlas/CHECKSUMS.sha256" \
+            --verify-tag \
+            --title "atlas-memory OpenClaw plugin ${PLUGIN_VERSION}" \
+            --notes "Byte-reproducible plugin tarball, contract-verified against the pinned OpenClaw host by CI at ${GITHUB_SHA}. Verify with: shasum -a 256 -c CHECKSUMS.sha256"
