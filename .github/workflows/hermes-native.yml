@@ -13,6 +13,10 @@ on:
       - "tests/hermes/**"
       - ".github/workflows/hermes-native.yml"
   workflow_dispatch:
+  schedule:
+    # Weekly canary: this contract pins upstream fixtures; a scheduled run
+    # catches upstream/runner drift without waiting for a code push.
+    - cron: "41 10 * * 1"
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
