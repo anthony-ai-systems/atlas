@@ -21,7 +21,7 @@ jobs:
     permissions:
       contents: write
     steps:
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       # The committed tarball is byte-verified against an npm-pack rebuild by
       # the pinned-openclaw-contract job on every push that touches the
       # integration (plus the weekly canary). This job deliberately does NOT
