@@ -95,7 +95,7 @@ dev = [
     "pytest-cov>=4.1",
     "pytest-xdist>=3.5",
     "hypothesis>=6.100",
-    "ruff>=0.4",
+    "ruff>=0.16.2",
     "mypy>=1.10",
     # The sdist-allowlist tests build a real sdist; without this they skip.
     "build>=1.5.0",
