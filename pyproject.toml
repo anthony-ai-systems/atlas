@@ -99,7 +99,7 @@ dev = [
     "mypy>=1.10",
     # The sdist-allowlist tests build a real sdist; without this they skip.
     "build>=1.5.0",
-    "testcontainers[neo4j]>=4.0",
+    "testcontainers[neo4j]>=4.15.0",
     # Tests cover the LLM paths via mocked clients; no need to ship
     # the real anthropic SDK for the test suite, but include it so
     # `pip install -e .[dev]` gives contributors the full feature set.
